@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchProducts, submitCheckout } from './api/products.js';
-import { useCart } from './context/CartContext.jsx';
+import { useCart, MAX_QTY } from './context/CartContext.jsx';
+import { useToast } from './context/ToastContext.jsx';
 import { formatPrice } from './utils/formatPrice.js';
 import Header from './components/Header.jsx';
 import ProductGrid from './components/ProductGrid.jsx';
@@ -18,6 +19,7 @@ export default function App() {
   //   { type: 'remove', item }
   //   { type: 'checkout' } -> { type: 'checkout', busy: true } -> { type: 'checkoutDone' } | { type: 'checkoutFailed' }
   const [dialog, setDialog] = useState(null);
+  const toast = useToast();
   const checkingOut = dialog?.type === 'checkout' && dialog.busy;
 
   const load = useCallback(() => {
@@ -39,6 +41,26 @@ export default function App() {
 
   const closeCart = useCallback(() => setCartOpen(false), []);
   const closeDialog = () => setDialog(null);
+
+  const handleAdd = (product) => {
+    const inCart = items.find((i) => i.product.id === product.id)?.quantity ?? 0;
+    if (inCart >= MAX_QTY) {
+      toast.show({
+        key: `max-${product.id}`,
+        type: 'warning',
+        title: '已達購買上限',
+        message: `「${product.name}」每人最多購買 ${MAX_QTY} 件`,
+      });
+      return;
+    }
+    add(product, 1);
+    toast.show({
+      key: `added-${product.id}`,
+      title: '已加入購物車',
+      message: `${product.name}（購物車內共 ${inCart + 1} 件）`,
+      action: { label: '查看購物車', onClick: () => setCartOpen(true) },
+    });
+  };
 
   const requestRemove = (item) => setDialog({ type: 'remove', item });
 
@@ -79,7 +101,7 @@ export default function App() {
           商品載入失敗。<button type="button" onClick={load}>重試</button>
         </div>
       )}
-      {status === 'ready' && <ProductGrid products={products} onAdd={(p) => add(p, 1)} />}
+      {status === 'ready' && <ProductGrid products={products} onAdd={handleAdd} />}
 
       <CartDrawer
         open={cartOpen}
