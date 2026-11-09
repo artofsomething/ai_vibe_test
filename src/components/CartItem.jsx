@@ -7,7 +7,12 @@ export default function CartItem({ item, onDecrement, onIncrement, onRemove }) {
       <div className="cart-item-image">圖片</div>
       <div className="cart-item-details">
         <div className="cart-item-title">{product.name}</div>
-        <div className="cart-item-price">{formatPrice(product.price)}</div>
+        <div className="cart-item-price">
+          {formatPrice(product.price)}
+          {quantity > 1 && (
+            <span className="cart-item-subtotal"> × {quantity} = {formatPrice(product.price * quantity)}</span>
+          )}
+        </div>
         <div className="quantity-controls">
           <button type="button" className="quantity-btn" aria-label={`減少 ${product.name} 數量`} onClick={onDecrement}>−</button>
           <span className="quantity-display">{quantity}</span>

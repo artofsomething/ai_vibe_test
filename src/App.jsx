@@ -9,7 +9,7 @@ import CartDrawer from './components/CartDrawer.jsx';
 import ConfirmDialog from './components/ConfirmDialog.jsx';
 
 export default function App() {
-  const { items, totalPrice, add, remove, removeMany } = useCart();
+  const { items, totalPrice, totalQuantity, add, remove, removeMany } = useCart();
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [cartOpen, setCartOpen] = useState(false);
@@ -89,8 +89,6 @@ export default function App() {
     }
   };
 
-  const totalQty = items.reduce((n, i) => n + i.quantity, 0);
-
   return (
     <div className="container">
       <Header onCartClick={() => setCartOpen((o) => !o)} />
@@ -131,7 +129,7 @@ export default function App() {
         onConfirm={confirmCheckout}
         onCancel={closeDialog}
       >
-        <p>共 {totalQty} 件商品，總計 <strong>{formatPrice(totalPrice)}</strong>。</p>
+        <p>共 {totalQuantity} 件商品，總計 <strong>{formatPrice(totalPrice)}</strong>。</p>
         <p>確定要結帳嗎？</p>
       </ConfirmDialog>
 

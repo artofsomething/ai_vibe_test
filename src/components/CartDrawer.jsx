@@ -4,7 +4,7 @@ import { formatPrice } from '../utils/formatPrice.js';
 import CartItem from './CartItem.jsx';
 
 export default function CartDrawer({ open, onClose, onCheckout, onRequestRemove, checkingOut }) {
-  const { items, totalPrice, setQty } = useCart();
+  const { items, totalPrice, totalQuantity, setQty } = useCart();
   const closeRef = useRef(null);
 
   useEffect(() => {
@@ -30,7 +30,10 @@ export default function CartDrawer({ open, onClose, onCheckout, onRequestRemove,
         aria-hidden={!open}
       >
         <div className="cart-header">
-          <h2>購物車</h2>
+          <h2>
+            購物車
+            {totalQuantity > 0 && <span className="cart-header-count">（{totalQuantity} 件）</span>}
+          </h2>
           <button ref={closeRef} type="button" className="close-cart" aria-label="關閉購物車" onClick={onClose}>
             ×
           </button>
@@ -57,6 +60,12 @@ export default function CartDrawer({ open, onClose, onCheckout, onRequestRemove,
         )}
 
         <div className="cart-total">
+          {items.length > 0 && (
+            <div className="cart-summary">
+              <span>{items.length} 種商品</span>
+              <span>共 {totalQuantity} 件</span>
+            </div>
+          )}
           <div className="total-price">總計: {formatPrice(totalPrice)}</div>
           <button
             type="button"

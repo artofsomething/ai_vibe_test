@@ -58,9 +58,11 @@ export function CartProvider({ children }) {
 
   const value = useMemo(() => {
     const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+    const totalQuantity = items.reduce((n, i) => n + i.quantity, 0);
     return {
       items,
       totalPrice,
+      totalQuantity,
       add: (product, qty) => dispatch({ type: 'add', product, qty }),
       setQty: (id, quantity) => dispatch({ type: 'setQty', id, quantity }),
       remove: (id) => dispatch({ type: 'remove', id }),
