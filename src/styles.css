@@ -300,7 +300,7 @@ button { font: inherit; }
 /* Toast notifications */
 .toast-viewport {
   position: fixed;
-  top: 16px;
+  top: 104px; /* below the header so the cart button stays clickable */
   right: 16px;
   z-index: 1500; /* above cart drawer, below confirm dialogs */
   display: flex;
@@ -389,7 +389,7 @@ button { font: inherit; }
 @keyframes toast-progress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
 @media (max-width: 600px) {
-  .toast-viewport { top: auto; bottom: 16px; right: 16px; }
+  .toast-viewport { top: auto; bottom: 16px; left: 16px; right: 16px; width: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
