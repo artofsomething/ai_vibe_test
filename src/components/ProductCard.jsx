@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { formatPrice } from '../utils/formatPrice.js';
+import { highlightParts } from '../utils/search.js';
 
-export default function ProductCard({ product, onAdd }) {
+export default function ProductCard({ product, onAdd, highlight = '' }) {
   const [imgFailed, setImgFailed] = useState(false);
 
   return (
@@ -18,7 +19,11 @@ export default function ProductCard({ product, onAdd }) {
           />
         )}
       </div>
-      <h3 className="product-title">{product.name}</h3>
+      <h3 className="product-title">
+        {highlightParts(product.name, highlight).map((part, i) =>
+          part.match ? <mark key={i}>{part.text}</mark> : <span key={i}>{part.text}</span>
+        )}
+      </h3>
       <div className="product-price">{formatPrice(product.price)}</div>
       <button type="button" className="add-to-cart-btn" onClick={() => onAdd(product)}>
         加入購物車

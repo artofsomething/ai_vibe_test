@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchProducts, submitCheckout } from './api/products.js';
 import { useCart, MAX_QTY } from './context/CartContext.jsx';
 import { useToast } from './context/ToastContext.jsx';
@@ -7,12 +7,22 @@ import Header from './components/Header.jsx';
 import ProductGrid from './components/ProductGrid.jsx';
 import CartDrawer from './components/CartDrawer.jsx';
 import ConfirmDialog from './components/ConfirmDialog.jsx';
+import SearchBar from './components/SearchBar.jsx';
+import { useDebounce } from './hooks/useDebounce.js';
+import { matchesQuery } from './utils/search.js';
 
 export default function App() {
   const { items, totalPrice, totalQuantity, add, remove, removeMany } = useCart();
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [cartOpen, setCartOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 250);
+
+  const filteredProducts = useMemo(
+    () => products.filter((p) => matchesQuery(p.name, debouncedQuery)),
+    [products, debouncedQuery]
+  );
 
   // Dialog state:
   //   null
@@ -99,7 +109,25 @@ export default function App() {
           商品載入失敗。<button type="button" onClick={load}>重試</button>
         </div>
       )}
-      {status === 'ready' && <ProductGrid products={products} onAdd={handleAdd} />}
+      <SearchBar
+        value={query}
+        onChange={setQuery}
+        resultCount={filteredProducts.length}
+        totalCount={products.length}
+        disabled={status !== 'ready'}
+      />
+
+      {status === 'ready' &&
+        (filteredProducts.length > 0 ? (
+          <ProductGrid products={filteredProducts} onAdd={handleAdd} highlight={debouncedQuery} />
+        ) : (
+          <div className="search-empty">
+            <p>找不到與「{debouncedQuery.trim()}」相關的商品</p>
+            <button type="button" className="search-empty-btn" onClick={() => setQuery('')}>
+              顯示全部商品
+            </button>
+          </div>
+        ))}
 
       <CartDrawer
         open={cartOpen}
